@@ -3,18 +3,18 @@ pipeline {
 
     stages{
 
-    stage('init') {
-    steps {
-    bat 'mvn clean'
-}}
+//    stage('init') {
+//    steps {
+//    bat 'mvn clean'
+//}}
 
-    stage('test') {
-    steps {
-    bat 'mvn test'
-junit 'target/surefire-reports/*.xml'
-
-    }
-}
+//    stage('test') {
+//    steps {
+//    bat 'mvn test'
+//junit 'target/surefire-reports/*.xml'
+//
+//    }
+//}
 
 stage('build') {
     steps {
@@ -23,15 +23,20 @@ stage('build') {
         archiveArtifacts artifacts: 'target/*.jar'
 }
 
+emailext(subject: " Build réussi: "),
+    body: "Le build a réussi",
+    to: "andou0590@gmail.com"
+     )
+
 }
 stage('documentation') {
     steps {
         bat 'mvn javadoc:javadoc'
 //        archiveArtifacts artifacts: 'target/site/**' , fingerprint: true
 
-        bat 'powershell Compress-Archive -Path target/site/* -DestinationPath target/doc.zip'
+//        bat 'powershell Compress-Archive -Path target/site/* -DestinationPath target/doc.zip'
 
-        archiveArtifacts artifacts: 'target/doc.zip'
+//        archiveArtifacts artifacts: 'target/doc.zip'
 
 }
 post{
@@ -51,8 +56,7 @@ post{
 
 }
 
-emailext(subject: " Build réussi: "),
-    body: "Le build a réussi",
-    to: "andou0590@gmail.com"
-)
-    }}
+
+    }
+
+    }
