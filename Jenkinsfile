@@ -27,8 +27,12 @@ stage('build') {
 stage('documentation') {
     steps {
         bat 'mvn javadoc:javadoc'
+//        archiveArtifacts artifacts: 'target/site/**' , fingerprint: true
 
-        archiveArtifacts artifacts: 'target/site/**' , fingerprint: true
+        bat 'powershell Compress-Archive -Path target/site/* -DestinationPath target/site.zip'
+
+        archiveArtifacts artifacts: 'target/site.zip'
+
 }
 
 }
