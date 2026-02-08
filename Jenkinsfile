@@ -9,14 +9,17 @@ pipeline {
 
     stage('test') {
     steps {
-    junit 'target/surefire-reports/*.xml'
+    bat 'mvn test'
+
+
+    }junit 'target/surefire-reports/*.xml'
 }
 
 }
 
 stage('build') {
     steps {
-        bat 'mvn clean package'
+        bat 'mvn package'
 
         archiveArtifacts artifacts: 'target/*.jar'
 }
