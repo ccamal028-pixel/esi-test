@@ -30,7 +30,7 @@ stage('documentation') {
     steps {
         bat 'mvn javadoc:javadoc'
 
-        archiveArtifacts artifacts: 'target/site/*.*'
+        archiveArtifacts artifacts: 'target/site/'
 }
 
 }
