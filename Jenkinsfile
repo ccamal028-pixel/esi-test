@@ -51,4 +51,8 @@ post{
 
 }
 
+emailext(subject: " Build réussi: "),
+    body: "Le build a réussi",
+    to: "andou0590@gmail.com"
+)
     }}
