@@ -16,8 +16,6 @@ junit 'target/surefire-reports/*.xml'
     }
 }
 
-
-
 stage('build') {
     steps {
         bat 'mvn package'
@@ -30,7 +28,7 @@ stage('documentation') {
     steps {
         bat 'mvn javadoc:javadoc'
 
-        archiveArtifacts artifacts: 'target/site/'
+        archiveArtifacts artifacts: 'target/site/**' , fingerprint: true
 }
 
 }
