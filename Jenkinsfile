@@ -34,6 +34,20 @@ stage('documentation') {
         archiveArtifacts artifacts: 'target/doc.zip'
 
 }
+post{
+    always {
+ publishHTML (
+ target :
+ [allowMissing: false,
+  alwaysLinkToLastBuild: true,
+  keepAll: true,
+  reportDir: 'target/site/apidocs',
+  reportFiles: 'index.html',
+  reportName: 'Documentation',
+  reportTitles: 'The Report'
+  ])
+}
+}
 
 }
 
