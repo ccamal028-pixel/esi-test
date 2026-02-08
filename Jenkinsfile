@@ -5,7 +5,7 @@ pipeline {
     stage('init') {
     steps {
     bat 'mvn clean'
-}
+}}
 
     stage('test') {
     steps {
@@ -15,7 +15,7 @@ pipeline {
     }junit 'target/surefire-reports/*.xml'
 }
 
-}
+
 
 stage('build') {
     steps {
