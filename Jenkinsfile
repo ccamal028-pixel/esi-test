@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages{
+
     stage('init') {
     steps {
     bat 'mvn clean'
@@ -10,9 +11,9 @@ pipeline {
     stage('test') {
     steps {
     bat 'mvn test'
+junit 'target/surefire-reports/*.xml'
 
-
-    }junit 'target/surefire-reports/*.xml'
+    }
 }
 
 
