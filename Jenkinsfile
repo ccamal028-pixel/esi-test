@@ -26,5 +26,13 @@ stage('build') {
 }
 
 }
+stage('documentation') {
+    steps {
+        bat 'mvn javadoc:javadoc'
+
+        archiveArtifacts artifacts: 'target/site/*.*'
+}
+
+}
 
     }}
