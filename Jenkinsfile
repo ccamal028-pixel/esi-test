@@ -16,6 +16,13 @@ pipeline {
                         to: "andou0590@gmail.com"
                     )
                 }
+                failure {
+                    mail(
+                        subject: "Build failed",
+                        body: "Le build a echoé.",
+                        to: "andou0590@gmail.com"
+                    )
+                }
             }
         }
 
