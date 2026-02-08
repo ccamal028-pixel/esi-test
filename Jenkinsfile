@@ -8,6 +8,8 @@ pipeline {
     bat 'mvn clean package'
 
     archiveArtifacts artifacts: 'target/*.jar'
+
+    junit 'target/surefire-reports/*.xml'
 }
 
 }
