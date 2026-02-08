@@ -10,7 +10,7 @@ pipeline {
             }
             post {
                 success {
-                    emailext(
+                    mail(
                         subject: "Build réussi",
                         body: "Le build a réussi avec succès.",
                         to: "andou0590@gmail.com"
