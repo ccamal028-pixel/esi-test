@@ -29,9 +29,9 @@ stage('documentation') {
         bat 'mvn javadoc:javadoc'
 //        archiveArtifacts artifacts: 'target/site/**' , fingerprint: true
 
-        bat 'powershell Compress-Archive -Path target/site/* -DestinationPath target/site.zip'
+        bat 'powershell Compress-Archive -Path target/site/* -DestinationPath target/doc.zip'
 
-        archiveArtifacts artifacts: 'target/site.zip'
+        archiveArtifacts artifacts: 'target/doc.zip'
 
 }
 
