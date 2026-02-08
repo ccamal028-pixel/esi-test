@@ -6,6 +6,8 @@ pipeline {
     stage('build') {
     steps {
     bat 'mvn clean package'
+
+    archiveArtifacts artifacts: 'target/*.jar'
 }
 
 }
