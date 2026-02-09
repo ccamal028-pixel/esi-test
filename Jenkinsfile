@@ -1,56 +1,80 @@
 pipeline {
     agent any
-
+// mot de passe : bino ibey wugx vtnv
     stages {
-    stage('test') {
-    steps {
-    bat 'mvn test'
-junit 'target/surefire-reports/*.xml'
 
-    }
-}
-        stage('build') {
+        stage('Init') {
             steps {
-                bat 'mvn package'
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                bat 'mvnw.cmd clean'
             }
-            post {
-                success {
-                    mail(
-                        subject: "Build réussi",
-                        body: "Le build a réussi avec succès.",
-                        to: "andou0590@gmail.com"
-                    )
-                }
-                failure {
-                    mail(
-                        subject: "Build failed",
-                        body: "Le build a echoé.",
-                        to: "andou0590@gmail.com"
-                    )
-                }
+        }
+        stage("PARALLEL"){
+         parallel{
+         stage('Test') {
+                     steps {
+                         bat 'mvnw.cmd test'
+                         junit 'target/surefire-reports/*.xml'
+                     }
+                 }
+
+                 stage('Documentation') {
+                      steps {
+                          bat 'mvnw.cmd javadoc:javadoc'
+                      }
+                      post {
+                       always {
+                                     publishHTML(target: [
+                                         allowMissing: false,
+                                         alwaysLinkToLastBuild: true,
+                                         keepAll: true,
+                                         reportDir: 'target/site/apidocs',
+                                         reportFiles: 'index.html',
+                                         reportName: 'Documentation'
+                                     ])
+                       }
+                      }
+                 }
+         }}
+
+
+        stage('Build') {
+            steps {
+                bat 'mvnw.cmd package'
+                archiveArtifacts artifacts: 'target/*.jar'
             }
         }
 
-        stage('documentation') {
-            steps {
-                bat 'mvn javadoc:javadoc'
-            }
-            post {
-                always {
-                    publishHTML(
-                        target: [
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: true,
-                            keepAll: true,
-                            reportDir: 'target/site/apidocs',
-                            reportFiles: 'index.html',
-                            reportName: 'Documentation',
-                            reportTitles: 'The Report'
-                        ]
-                    )
-                }
-            }
+
+
+
+        stage('Deploy') {
+        when { //si la branche production
+        branch 'masterr'
         }
+                    steps {
+                        echo 'deploying'
+                        bat 'docker-compose down'
+                        bat 'docker-compose up  --build -d'
+                    }
+                }
+
     }
+
+//     post {
+//         success {
+//             mail(
+//                 subject: "Build réussi",
+//                 body: "Le build a réussi.",
+//                 to: "andou0590@gmail.com"
+//             )
+//         }
+//
+//         failure {
+//             mail(
+//                 subject: "Build échoué",
+//                 body: "Le build a échoué.",
+//                 to: "andou0590@gmail.com"
+//             )
+//         }
+//     }
 }
