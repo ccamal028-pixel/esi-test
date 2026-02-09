@@ -49,7 +49,7 @@ pipeline {
 
         stage('Deploy') {
         when { //si la branche production
-        branch 'masterr'
+        branch 'main'
         }
                     steps {
                         echo 'deploying'
