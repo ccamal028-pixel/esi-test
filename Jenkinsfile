@@ -71,12 +71,12 @@ stage('docker-Deploy') {
 
 stage('Health Check') {
     steps {
-    def httpCode ="000"
+
         echo "Checking Health..."
         sleep time: 15, unit: 'SECONDS'
 
         script {
-
+      def httpCode ="000"
         try{
             def result = bat(
                 script: 'curl -s -o response.json -w %%{http_code} http://localhost:8082/actuator/health',
