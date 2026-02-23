@@ -75,6 +75,9 @@ stage('Health Check') {
         sleep time: 15, unit: 'SECONDS'
 
         script {
+
+
+        currentBuild.result = 'FAILURE'
             def result = bat(
                 script: 'curl -s -o response.json -w %%{http_code} http://localhost:8082/actuator/health',
                 returnStdout: true
@@ -85,16 +88,19 @@ stage('Health Check') {
             echo "HTTP Code: ${httpCode}"
 
             if (httpCode == "200") {
+            currentBuild.result = 'SUCCESS'
                 def body = readFile('response.json')
                 if (body.contains('"status":"UP"')) {
                     echo "Application is healthy ✅"
                 } else {
+                currentBuild.result = 'FAILURE'
                     error("Health endpoint returned DOWN")
                 }
-            } else {
-                currentBuild.result = 'FAILURE'
-                error("Application not reachable (HTTP ${httpCode})")
             }
+            //else {
+                currentBuild.result = 'FAILURE'
+              //  error("Application not reachable (HTTP ${httpCode})")
+            //}
         }
     }
 }
