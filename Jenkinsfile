@@ -155,4 +155,13 @@ stage('Rollback') {
 //             )
 //         }
 //     }
+
+    post {
+        success {
+            echo 'success'
+        }
+        failure {
+            echo 'failure'
+        }
+    }
 }
