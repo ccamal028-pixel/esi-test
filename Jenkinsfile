@@ -71,24 +71,24 @@ stage('docker-Deploy') {
 
 stage('Health Check') {
     steps {
+    def httpCode ="000"
         echo "Checking Health..."
         sleep time: 15, unit: 'SECONDS'
 
         script {
 
-
-        currentBuild.result = 'FAILURE'
+        try{
             def result = bat(
                 script: 'curl -s -o response.json -w %%{http_code} http://localhost:8082/actuator/health',
                 returnStdout: true
             ).trim()
 
-            def httpCode = result[-3..-1]
+             httpCode = result[-3..-1]
 
             echo "HTTP Code: ${httpCode}"
 
             if (httpCode == "200") {
-            currentBuild.result = 'SUCCESS'
+
                 def body = readFile('response.json')
                 if (body.contains('"status":"UP"')) {
                     echo "Application is healthy ✅"
@@ -97,10 +97,15 @@ stage('Health Check') {
                     error("Health endpoint returned DOWN")
                 }
             }
-            //else {
+            else {
                 currentBuild.result = 'FAILURE'
-              //  error("Application not reachable (HTTP ${httpCode})")
-            //}
+               error("Application not reachable (HTTP ${httpCode})")
+            }
+                    }
+                    catch(Exception ex){
+                      currentBuild.result = 'FAILURE'
+                                   error("Application not reachable (HTTP ${httpCode})")
+                    }
         }
     }
 }
@@ -109,11 +114,6 @@ stage('Rollback') {
                expression { currentBuild.result == 'FAILURE' }
            }
            steps {
-              /*  def stableTag = sh(
-                       script: "git tag --sort=-creatordate | head -n 1",
-                       returnStdout: true
-                   ).trim()
-               echo "pro stable ${stableTag}" */
                echo "Starting rollback to tag: ${ROLLBACK_TAG}"
                script {
                    bat """
