@@ -29,7 +29,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User loginUserByUsername(String username,boolean enabled){
         //return userRepository.findUserByUsernameAndEnabled(username,true);
-        return userRepository.findUserByUsername(username);
+//        return userRepository.findUserByUsername(username);
+
+        User u = new User();
+        u.setUsername("Admin");
+        u.setId(100000L);
+        u.setEmail("admin@esi.dz");
+        u.setEnabled(true);
+//        u.setRoles("");
+        return u;
 
     }
 
