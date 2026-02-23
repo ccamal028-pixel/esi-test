@@ -61,50 +61,45 @@ stage('docker-Deploy') {
         bat 'docker-compose up --build -d'
     }
 }
-
 stage('Health Check') {
-   steps {
-       echo "Checking Health..."
-       sleep time: 10, unit: 'SECONDS'
+    steps {
+        echo "Checking Health..."
+        sleep time: 15, unit: 'SECONDS'
 
+        script {
 
-       script {
+            // Run curl and always return output
+            def result = bat(
+                script: 'curl -s -o response.json -w %{http_code} http://localhost:8082/actuator/health',
+                returnStdout: true
+            ).trim()
 
+            // Extract only the HTTP code (last 3 characters)
+            def httpCode = result[-3..-1]
 
-           def result = bat(
-               script: """
-                   curl -s -o response.json -w "%{http_code}" http://localhost:8082/actuator/health || echo "000"
-               """,
-               returnStdout: true
-           ).trim()
+            echo "HTTP Code: ${httpCode}"
 
+            if (httpCode == "200") {
 
-           def httpCode = result
+                if (fileExists('response.json')) {
+                    def body = readFile('response.json').trim()
+                    echo "Body: ${body}"
 
+                    if (body.contains('"status":"UP"')) {
+                        echo "Application is healthy ✅"
+                    } else {
+                        error("Health endpoint returned DOWN status")
+                    }
 
-           echo "HTTP Code: ${httpCode}"
+                } else {
+                    error("response.json not found")
+                }
 
-
-           if (httpCode == "200") {
-
-
-               def body = readFile('response.json')
-               echo "Body: ${body}"
-
-
-               if (body.contains('"status":"UP"')) {
-                   echo "Application is healthy ✅"
-               } else {
-                    currentBuild.result = 'FAILURE'
-               }
-
-
-           } else {
-               echo "Application not reachable"
-                currentBuild.result = 'FAILURE'
-           }
-       }
-   }
+            } else {
+                error("Application not reachable (HTTP ${httpCode})")
+            }
+        }
+    }
 }
 
 
