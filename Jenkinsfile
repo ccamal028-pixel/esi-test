@@ -69,46 +69,53 @@ stage('docker-Deploy') {
 }
 
 
-stage('Health Check') {
-    steps {
+        stage('Health Check') {
+            steps {
+                echo "Checking Health..."
+                sleep time: 15, unit: 'SECONDS'
 
-        echo "Checking Health..."
-        sleep time: 15, unit: 'SECONDS'
+                script {
 
-        script {
-      def httpCode ="000"
-        try{
-            def result = bat(
-                script: 'curl -s -o response.json -w %%{http_code} http://localhost:8082/actuator/health',
-                returnStdout: true
-            ).trim()
+                    def httpCode = bat(script: '''
+                                        @echo off
+                                        setlocal
 
-             httpCode = result[-3..-1]
+                                        curl -s -o response.json -w "%%{http_code}" http://localhost:8082/actuator/health > status.txt 2>nul
 
-            echo "HTTP Code: ${httpCode}"
+                                        if errorlevel 1 (
+                                            echo 000 > status.txt
+                                        )
 
-            if (httpCode == "200") {
+                                        set /p code=<status.txt
+                                        echo %code%
 
-                def body = readFile('response.json')
-                if (body.contains('"status":"UP"')) {
-                    echo "Application is healthy ✅"
-                } else {
-                currentBuild.result = 'FAILURE'
-                    error("Health endpoint returned DOWN")
+                                        exit /b 0
+                                        ''',
+                            returnStdout: true).trim()
+
+                    echo "HTTP Code: ${httpCode}"
+
+                    if (httpCode == "200") {
+
+                        def body = readFile('response.json')
+                        echo "Body: ${body}"
+
+                        if (body.contains('"status":"UP"')) {
+                            echo "Application is healthy ✅"
+                        } else {
+                            error("Health endpoint returned non-UP status")
+                        }
+
+                    } else {
+                        currentBuild.result = "FAILURE"
+
+
+                    }
+                    echo currentBuild.result
                 }
             }
-            else {
-                currentBuild.result = 'FAILURE'
-               error("Application not reachable (HTTP ${httpCode})")
-            }
-                    }
-                    catch(Exception ex){
-                      currentBuild.result = 'FAILURE'
-                                   error("Application not reachable (HTTP ${httpCode})")
-                    }
         }
-    }
-}
+
 stage('Rollback') {
            when {
                expression { currentBuild.result == 'FAILURE' }
