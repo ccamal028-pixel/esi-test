@@ -6,7 +6,7 @@ services:
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_DATABASE: livdb
+      MYSQL_DATABASE: livdb0
       MYSQL_USER: myuser
       MYSQL_PASSWORD: mypassword
       MYSQL_ROOT_PASSWORD: rootpassword

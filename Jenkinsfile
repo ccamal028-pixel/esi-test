@@ -1,5 +1,11 @@
 pipeline {
     agent any
+
+
+    environment {
+    ROLLBACK_TAG = "v1.0.0"
+    ROLLBACK_BRANCH = "main"
+}
 // mot de passe : bino ibey wugx vtnv
     stages {
 
@@ -61,6 +67,8 @@ stage('docker-Deploy') {
         bat 'docker-compose up --build -d'
     }
 }
+
+
 stage('Health Check') {
     steps {
         echo "Checking Health..."
@@ -89,6 +97,28 @@ stage('Health Check') {
         }
     }
 }
+stage('Rollback') {
+           when {
+               expression { currentBuild.result == 'FAILURE' }
+           }
+           steps {
+              /*  def stableTag = sh(
+                       script: "git tag --sort=-creatordate | head -n 1",
+                       returnStdout: true
+                   ).trim()
+               echo "pro stable ${stableTag}" */
+               echo "Starting rollback to tag: ${ROLLBACK_TAG}"
+               script {
+                   sh """
+                        git fetch origin --tags --force                                        git checkout tags/${ROLLBACK_TAG} -b ${ROLLBACK_BRANCH}
+                   """
+                   echo "Rolled back to tag ${ROLLBACK_TAG} on new branch ${ROLLBACK_BRANCH}"
+
+                   //sh './deploy.sh'
+                   echo "Rollback deployment complete"
+               }
+           }
+       }
 
 
     }
