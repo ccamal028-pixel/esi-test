@@ -45,18 +45,22 @@ pipeline {
         }
 
 
-
-
-        stage('docker-Deploy') {
-        when { //si la branche production
+stage('docker-Deploy') {
+    when {
         branch 'main'
-        }
-                    steps {
-                        echo 'deploying'
-                        bat 'docker-compose down'
-                        bat 'docker-compose up  --build -d'
-                    }
-                }
+    }
+    steps {
+        echo 'Deploying application...'
+
+        // Stop and remove containers safely
+        bat 'docker-compose down --remove-orphans'
+        bat 'docker rm -f spring-boot-app || exit 0'
+        bat 'docker rm -f mysql-db || exit 0'
+
+        // Rebuild and start
+        bat 'docker-compose up --build -d'
+    }
+}
 
     }
 
