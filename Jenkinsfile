@@ -92,6 +92,7 @@ stage('Health Check') {
                     error("Health endpoint returned DOWN")
                 }
             } else {
+                currentBuild.result = 'FAILURE'
                 error("Application not reachable (HTTP ${httpCode})")
             }
         }
