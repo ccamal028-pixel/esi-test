@@ -67,34 +67,22 @@ stage('Health Check') {
         sleep time: 15, unit: 'SECONDS'
 
         script {
-
-            // Run curl and always return output
             def result = bat(
-                script: 'curl -s -o response.json -w %{http_code} http://localhost:8082/actuator/health',
+                script: 'curl -s -o response.json -w %%{http_code} http://localhost:8082/actuator/health',
                 returnStdout: true
             ).trim()
 
-            // Extract only the HTTP code (last 3 characters)
             def httpCode = result[-3..-1]
 
             echo "HTTP Code: ${httpCode}"
 
             if (httpCode == "200") {
-
-                if (fileExists('response.json')) {
-                    def body = readFile('response.json').trim()
-                    echo "Body: ${body}"
-
-                    if (body.contains('"status":"UP"')) {
-                        echo "Application is healthy ✅"
-                    } else {
-                        error("Health endpoint returned DOWN status")
-                    }
-
+                def body = readFile('response.json')
+                if (body.contains('"status":"UP"')) {
+                    echo "Application is healthy ✅"
                 } else {
-                    error("response.json not found")
+                    error("Health endpoint returned DOWN")
                 }
-
             } else {
                 error("Application not reachable (HTTP ${httpCode})")
             }
