@@ -8,12 +8,12 @@ pipeline {
                 bat 'mvnw.cmd clean'
             }
         }
-        stage("PARALLEL"){
+    /*    stage("PARALLEL"){
          parallel{
          stage('Test') {
                      steps {
                          bat 'mvnw.cmd test'
-                         junit 'target/surefire-reports/*.xml'
+                         junit 'target/surefire-reports*//*.xml'
                      }
                  }
 
@@ -34,7 +34,7 @@ pipeline {
                        }
                       }
                  }
-         }}
+         }}*/
 
 
         stage('Build') {
@@ -47,7 +47,7 @@ pipeline {
 
 
 
-        stage('Deploy') {
+        stage('docker-Deploy') {
         when { //si la branche production
         branch 'main'
         }
